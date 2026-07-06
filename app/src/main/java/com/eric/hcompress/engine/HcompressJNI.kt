@@ -1,19 +1,32 @@
 package com.eric.hcompress.engine
 
-/** JNI bridge to libhcompress.so (C-accelerated Huffman codec). */
+/** JNI bridge — gracefully falls back to null if native lib not available. */
 object HcompressJNI {
-    init { System.loadLibrary("hcompress") }
+    private val available: Boolean = try {
+        System.loadLibrary("hcompress")
+        true
+    } catch (e: UnsatisfiedLinkError) {
+        false
+    }
 
-    /** Encode raw bytes → compressed bytes. Returns null on failure. */
-    external fun encode(data: ByteArray, codes: IntArray, bitLengths: IntArray): ByteArray?
+    fun encode(data: ByteArray, codes: IntArray, bitLengths: IntArray): ByteArray? {
+        if (!available) return null
+        return nativeEncode(data, codes, bitLengths)
+    }
 
-    /** Decode compressed bytes → raw bytes. Returns null on failure. */
-    external fun decode(
-        compressed: ByteArray, baseCode: IntArray,
-        symbolOffset: IntArray, symbolsFlat: IntArray,
-        maxLen: Int, outCap: Int
-    ): ByteArray?
+    fun decode(compressed: ByteArray, baseCode: IntArray, symOffset: IntArray,
+               symsFlat: IntArray, maxLen: Int, outCap: Int): ByteArray? {
+        if (!available) return null
+        return nativeDecode(compressed, baseCode, symOffset, symsFlat, maxLen, outCap)
+    }
 
-    /** CRC-32 checksum */
-    external fun crc32(data: ByteArray): Int
+    fun crc32(data: ByteArray): Int {
+        if (!available) return -1
+        return nativeCrc32(data)
+    }
+
+    private external fun nativeEncode(data: ByteArray, codes: IntArray, bitLengths: IntArray): ByteArray?
+    private external fun nativeDecode(compressed: ByteArray, baseCode: IntArray, symOffset: IntArray,
+                                      symsFlat: IntArray, maxLen: Int, outCap: Int): ByteArray?
+    private external fun nativeCrc32(data: ByteArray): Int
 }

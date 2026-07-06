@@ -1,0 +1,9 @@
+R_DEF: Internal format may change without notice
+local
+id btn_compress
+id btn_decompress
+id btn_pick_file
+id btn_plugins
+id tv_file_name
+layout activity_main
+mipmap ic_launcher

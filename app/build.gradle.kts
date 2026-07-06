@@ -12,15 +12,9 @@ android {
         targetSdk = 34
         versionCode = 1
         versionName = "1.0.0"
-        ndk { abiFilters += listOf("arm64-v8a", "armeabi-v7a", "x86_64") }
-        externalNativeBuild {
-            cmake { arguments("-DANDROID_STL=c++_shared") }
-        }
     }
     buildFeatures { viewBinding = true }
-    externalNativeBuild {
-        cmake { path("src/main/jni/CMakeLists.txt") }
-    }
+    kotlinOptions { jvmTarget = "17" }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
