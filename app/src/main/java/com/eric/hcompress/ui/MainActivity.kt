@@ -1,27 +1,35 @@
 package com.eric.hcompress.ui
 
+import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
+import android.content.res.Configuration
 import android.net.Uri
 import android.os.Bundle
-import android.os.Environment
 import android.provider.OpenableColumns
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import com.eric.hcompress.engine.HuffmanEngine
+import com.eric.hcompress.plugin.PluginManager
 import kotlinx.coroutines.*
-import java.io.File
 
 class MainActivity : AppCompatActivity() {
 
     private var fileUri: Uri? = null
     private var fileName: String = ""
-    private var inputSize: Int = 0
     private var isDecompress = false
     private lateinit var statusText: TextView
     private lateinit var resultText: TextView
     private lateinit var progressBar: ProgressBar
+    private lateinit var prefs: SharedPreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        // Apply saved theme
+        prefs = getSharedPreferences("hcompress", Context.MODE_PRIVATE)
+        val theme = prefs.getString("theme", "system") ?: "system"
+        applyTheme(theme)
+
         super.onCreate(savedInstanceState)
 
         val layout = LinearLayout(this).apply {
@@ -50,13 +58,104 @@ class MainActivity : AppCompatActivity() {
         resultText = TextView(this).apply { text = ""; textSize = 13f; setPadding(0, 16, 0, 0); isSingleLine = false }
         layout.addView(resultText)
 
+        // Bottom buttons row
+        val bottomRow = LinearLayout(this).apply {
+            orientation = LinearLayout.HORIZONTAL; setPadding(0, 20, 0, 0)
+        }
+        bottomRow.addView(Button(this).apply {
+            text = "主题"; setOnClickListener { showThemePicker() }
+        }, LinearLayout.LayoutParams(0, -2, 1f))
+        bottomRow.addView(Button(this).apply {
+            text = "插件商店"; setOnClickListener { showPluginStore() }
+        }, LinearLayout.LayoutParams(0, -2, 1f))
+        layout.addView(bottomRow)
+
         layout.addView(Button(this).apply {
-            text = "输出至: Download/hcompress/"; setOnClickListener {
-                toast("文件保存在 下载/hcompress/ 文件夹")
+            text = "📂 打开输出文件夹"
+            setOnClickListener {
+                try {
+                    // Method 1: Direct file path (works on most Android + file managers)
+                    val path = android.os.Environment.getExternalStoragePublicDirectory(
+                        android.os.Environment.DIRECTORY_DOWNLOADS
+                    ).absolutePath + "/hcompress"
+                    val file = java.io.File(path)
+                    if (!file.exists()) file.mkdirs()
+                    val uri = Uri.parse(file.toURI().toString())
+                    startActivity(Intent(Intent.ACTION_VIEW).apply {
+                        setDataAndType(uri, "resource/folder")
+                        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    })
+                } catch (_: Exception) {
+                    // Method 2: SAF tree
+                    try {
+                        startActivity(Intent(Intent.ACTION_OPEN_DOCUMENT_TREE).apply {
+                            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                        })
+                    } catch (_: Exception) {
+                        toast("请手动打开 下载/hcompress/ 文件夹")
+                    }
+                }
             }
-        }, LinearLayout.LayoutParams(-1, -2).apply { topMargin = 20 })
+        }, LinearLayout.LayoutParams(-1, -2).apply { topMargin = 12 })
 
         setContentView(layout)
+    }
+
+    private fun applyTheme(mode: String) {
+        val night = when (mode) {
+            "light" -> AppCompatDelegate.MODE_NIGHT_NO
+            "dark" -> AppCompatDelegate.MODE_NIGHT_YES
+            else -> AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
+        }
+        AppCompatDelegate.setDefaultNightMode(night)
+    }
+
+    private fun showThemePicker() {
+        val themes = arrayOf("浅色", "深色", "跟随系统")
+        val values = arrayOf("light", "dark", "system")
+        val current = prefs.getString("theme", "system") ?: "system"
+        val checked = values.indexOf(current)
+
+        android.app.AlertDialog.Builder(this)
+            .setTitle("选择主题")
+            .setSingleChoiceItems(themes, checked) { dialog, which ->
+                val mode = values[which]
+                prefs.edit().putString("theme", mode).apply()
+                applyTheme(mode)
+                dialog.dismiss()
+            }
+            .setNegativeButton("取消", null)
+            .show()
+    }
+
+    private fun showPluginStore() {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val plugins = PluginManager.fetchAvailable()
+                withContext(Dispatchers.Main) {
+                    if (plugins.isEmpty()) {
+                        toast("暂无可用的社区插件")
+                        return@withContext
+                    }
+                    val names = plugins.map { "${it.name} — ${it.description}" }.toTypedArray()
+                    android.app.AlertDialog.Builder(this@MainActivity)
+                        .setTitle("插件商店")
+                        .setItems(names) { _, idx ->
+                            CoroutineScope(Dispatchers.IO).launch {
+                                toast("正在安装 ${plugins[idx].name}…")
+                                val ok = PluginManager.install(this@MainActivity, plugins[idx])
+                                withContext(Dispatchers.Main) {
+                                    toast(if (ok) "${plugins[idx].name} 安装成功" else "安装失败")
+                                }
+                            }
+                        }
+                        .setNegativeButton("关闭", null)
+                        .show()
+                }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) { toast("获取插件失败: ${e.message}") }
+            }
+        }
     }
 
     private fun pickFile() {
@@ -71,8 +170,7 @@ class MainActivity : AppCompatActivity() {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == 1 && resultCode == RESULT_OK && data?.data != null) {
             val uri = data.data!!
-            // Take persistent permission
-            contentResolver.takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            try { contentResolver.takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION) } catch (_: Exception) {}
             fileUri = uri
             contentResolver.query(uri, null, null, null, null)?.use { cursor ->
                 if (cursor.moveToFirst()) {
@@ -95,7 +193,7 @@ class MainActivity : AppCompatActivity() {
                 if (isDecompress) {
                     val mag = byteArrayOf('H'.code.toByte(), 'C'.code.toByte(), 'F'.code.toByte(), 0x1A.toByte())
                     if (!inputBytes.take(4).toByteArray().contentEquals(mag)) {
-                        withContext(Dispatchers.Main) { toast("仅支持 HCF 格式。其他格式请用 PC 版") }
+                        withContext(Dispatchers.Main) { toast("仅支持 HCF 格式") }
                         return@launch
                     }
                     val blens = IntArray(256) { inputBytes[12 + it].toInt() and 0xFF }
@@ -111,7 +209,7 @@ class MainActivity : AppCompatActivity() {
                         ?: throw Exception("解码失败")
                     val outName = fileName.removeSuffix(".hcf").ifEmpty { "decompressed" }
                     val savedPath = saveToDownloads(outName, decoded)
-                    withContext(Dispatchers.Main) { resultText.text = "解压完成!\n${inputBytes.size} → ${origSize} 字节\n保存至: $savedPath" }
+                    withContext(Dispatchers.Main) { resultText.text = "解压完成!\n${inputBytes.size} → ${origSize} 字节\n$savedPath" }
                 } else {
                     val freq = HuffmanEngine.freqTable(inputBytes)
                     val (codes, blens) = HuffmanEngine.buildCanonical(freq)
@@ -122,9 +220,10 @@ class MainActivity : AppCompatActivity() {
                     for (i in 0..255) hdr[12 + i] = blens[i].toByte()
                     for (i in 0..7) hdr[268 + i] = ((inputBytes.size shr (i * 8)) and 0xFF).toByte()
                     val outName = "$fileName.hcf"
-                    val savedPath = saveToDownloads(outName, hdr + encoded)
-                    val ratio = (hdr.size + encoded.size) * 100.0 / inputBytes.size
-                    withContext(Dispatchers.Main) { resultText.text = "压缩完成!\n${inputBytes.size} → ${hdr.size + encoded.size} 字节 (${ratio.toInt()}%)\n保存至: $savedPath" }
+                    val output = hdr + encoded
+                    val savedPath = saveToDownloads(outName, output)
+                    val ratio = output.size * 100.0 / inputBytes.size
+                    withContext(Dispatchers.Main) { resultText.text = "压缩完成!\n${inputBytes.size} → ${output.size} 字节 (${ratio.toInt()}%)\n$savedPath" }
                 }
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) { resultText.text = "错误: ${e.message}" }
@@ -144,7 +243,7 @@ class MainActivity : AppCompatActivity() {
             ?: throw Exception("无法创建文件")
         contentResolver.openOutputStream(uri)?.use { it.write(data) }
             ?: throw Exception("无法写入文件")
-        return "Download/hcompress/$name"
+        return "下载/hcompress/$name"
     }
 
     private fun toast(msg: String) { runOnUiThread { Toast.makeText(this, msg, Toast.LENGTH_SHORT).show() } }

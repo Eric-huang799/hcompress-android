@@ -5,6 +5,7 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <application
         android:label="hcompress"
+        android:icon="@mipmap/ic_launcher"
         android:theme="@style/Theme.Material3.DayNight"
         android:supportsRtl="true">
         <activity

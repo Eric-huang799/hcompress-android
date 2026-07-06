@@ -1,9 +1,9 @@
 -- Merging decision tree log ---
 manifest
-ADDED from C:\Users\lenovo\hcompress-android\app\src\main\AndroidManifest.xml:2:1-19:12
-INJECTED from C:\Users\lenovo\hcompress-android\app\src\main\AndroidManifest.xml:2:1-19:12
-INJECTED from C:\Users\lenovo\hcompress-android\app\src\main\AndroidManifest.xml:2:1-19:12
-INJECTED from C:\Users\lenovo\hcompress-android\app\src\main\AndroidManifest.xml:2:1-19:12
+ADDED from C:\Users\lenovo\hcompress-android\app\src\main\AndroidManifest.xml:2:1-20:12
+INJECTED from C:\Users\lenovo\hcompress-android\app\src\main\AndroidManifest.xml:2:1-20:12
+INJECTED from C:\Users\lenovo\hcompress-android\app\src\main\AndroidManifest.xml:2:1-20:12
+INJECTED from C:\Users\lenovo\hcompress-android\app\src\main\AndroidManifest.xml:2:1-20:12
 MERGED from [androidx.databinding:viewbinding:8.2.0] C:\Users\lenovo\.gradle\caches\8.12\transforms\092414e90205e0fbd8701550843af876\transformed\viewbinding-8.2.0\AndroidManifest.xml:2:1-7:12
 MERGED from [com.google.android.material:material:1.11.0] C:\Users\lenovo\.gradle\caches\8.12\transforms\4901e8f525a9af030a440e6090cc8dd7\transformed\material-1.11.0\AndroidManifest.xml:17:1-24:12
 MERGED from [androidx.appcompat:appcompat-resources:1.6.1] C:\Users\lenovo\.gradle\caches\8.12\transforms\85dc1c36cc10260a95caf0e6ce46356c\transformed\appcompat-resources-1.6.1\AndroidManifest.xml:17:1-22:12
@@ -69,8 +69,8 @@ ADDED from C:\Users\lenovo\hcompress-android\app\src\main\AndroidManifest.xml:5:
 	android:name
 		ADDED from C:\Users\lenovo\hcompress-android\app\src\main\AndroidManifest.xml:5:22-78
 application
-ADDED from C:\Users\lenovo\hcompress-android\app\src\main\AndroidManifest.xml:6:5-18:19
-INJECTED from C:\Users\lenovo\hcompress-android\app\src\main\AndroidManifest.xml:6:5-18:19
+ADDED from C:\Users\lenovo\hcompress-android\app\src\main\AndroidManifest.xml:6:5-19:19
+INJECTED from C:\Users\lenovo\hcompress-android\app\src\main\AndroidManifest.xml:6:5-19:19
 MERGED from [com.google.android.material:material:1.11.0] C:\Users\lenovo\.gradle\caches\8.12\transforms\4901e8f525a9af030a440e6090cc8dd7\transformed\material-1.11.0\AndroidManifest.xml:22:5-20
 MERGED from [com.google.android.material:material:1.11.0] C:\Users\lenovo\.gradle\caches\8.12\transforms\4901e8f525a9af030a440e6090cc8dd7\transformed\material-1.11.0\AndroidManifest.xml:22:5-20
 MERGED from [androidx.constraintlayout:constraintlayout:2.0.1] C:\Users\lenovo\.gradle\caches\8.12\transforms\04a9eefbbc8ef7ff587f9c079ce9744e\transformed\constraintlayout-2.0.1\AndroidManifest.xml:9:5-20
@@ -92,27 +92,29 @@ MERGED from [androidx.startup:startup-runtime:1.1.1] C:\Users\lenovo\.gradle\cac
 	android:appComponentFactory
 		ADDED from [androidx.core:core:1.12.0] C:\Users\lenovo\.gradle\caches\8.12\transforms\f39d2840ae35cd380148a0a06345a3ea\transformed\core-1.12.0\AndroidManifest.xml:28:18-86
 	android:supportsRtl
-		ADDED from C:\Users\lenovo\hcompress-android\app\src\main\AndroidManifest.xml:9:9-35
+		ADDED from C:\Users\lenovo\hcompress-android\app\src\main\AndroidManifest.xml:10:9-35
 	android:label
 		ADDED from C:\Users\lenovo\hcompress-android\app\src\main\AndroidManifest.xml:7:9-34
+	android:icon
+		ADDED from C:\Users\lenovo\hcompress-android\app\src\main\AndroidManifest.xml:8:9-43
 	android:theme
-		ADDED from C:\Users\lenovo\hcompress-android\app\src\main\AndroidManifest.xml:8:9-56
+		ADDED from C:\Users\lenovo\hcompress-android\app\src\main\AndroidManifest.xml:9:9-56
 activity#com.eric.hcompress.ui.MainActivity
-ADDED from C:\Users\lenovo\hcompress-android\app\src\main\AndroidManifest.xml:10:9-17:20
+ADDED from C:\Users\lenovo\hcompress-android\app\src\main\AndroidManifest.xml:11:9-18:20
 	android:exported
-		ADDED from C:\Users\lenovo\hcompress-android\app\src\main\AndroidManifest.xml:12:13-36
+		ADDED from C:\Users\lenovo\hcompress-android\app\src\main\AndroidManifest.xml:13:13-36
 	android:name
-		ADDED from C:\Users\lenovo\hcompress-android\app\src\main\AndroidManifest.xml:11:13-44
+		ADDED from C:\Users\lenovo\hcompress-android\app\src\main\AndroidManifest.xml:12:13-44
 intent-filter#action:name:android.intent.action.MAIN+category:name:android.intent.category.LAUNCHER
-ADDED from C:\Users\lenovo\hcompress-android\app\src\main\AndroidManifest.xml:13:13-16:29
+ADDED from C:\Users\lenovo\hcompress-android\app\src\main\AndroidManifest.xml:14:13-17:29
 action#android.intent.action.MAIN
-ADDED from C:\Users\lenovo\hcompress-android\app\src\main\AndroidManifest.xml:14:17-68
+ADDED from C:\Users\lenovo\hcompress-android\app\src\main\AndroidManifest.xml:15:17-68
 	android:name
-		ADDED from C:\Users\lenovo\hcompress-android\app\src\main\AndroidManifest.xml:14:25-66
+		ADDED from C:\Users\lenovo\hcompress-android\app\src\main\AndroidManifest.xml:15:25-66
 category#android.intent.category.LAUNCHER
-ADDED from C:\Users\lenovo\hcompress-android\app\src\main\AndroidManifest.xml:15:17-76
+ADDED from C:\Users\lenovo\hcompress-android\app\src\main\AndroidManifest.xml:16:17-76
 	android:name
-		ADDED from C:\Users\lenovo\hcompress-android\app\src\main\AndroidManifest.xml:15:27-74
+		ADDED from C:\Users\lenovo\hcompress-android\app\src\main\AndroidManifest.xml:16:27-74
 uses-sdk
 INJECTED from C:\Users\lenovo\hcompress-android\app\src\main\AndroidManifest.xml reason: use-sdk injection requested
 INJECTED from C:\Users\lenovo\hcompress-android\app\src\main\AndroidManifest.xml
